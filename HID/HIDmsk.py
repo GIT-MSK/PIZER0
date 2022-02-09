@@ -5,6 +5,7 @@ import time
 NULL_CHAR = chr(0)
 
 # chars taken from https://github.com/ddavid456/NetworkPiKeyboard/blob/master/NetworkKeyboardAPI.py
+# Corresponds with US ANSI
 charList = {
     'KEY_A': 0x04, 'KEY_B': 0x05,
     'KEY_C': 0x06, 'KEY_D': 0x07,
@@ -51,8 +52,7 @@ charList = {
     'KEY_DELETE': 0x4c, 'KEY_END': 0x4d,
     'KEY_PAGEDOWN': 0x4e, 'KEY_RIGHT': 0x4f,
     'KEY_LEFT': 0x50, 'KEY_DOWN': 0x51,
-    'KEY_UP': 0x52, 'KEY_GUI': 0xe3,
-    'KEY_MEDIA_PLAYPAUSE': 0xe8,
+    'KEY_UP': 0x52,'KEY_MEDIA_PLAYPAUSE': 0xe8,
     'KEY_MEDIA_STOPCD': 0xe9, 'KEY_MEDIA_PREVIOUSSONG': 0xea,
     'KEY_MEDIA_NEXTSONG': 0xeb, 'KEY_MEDIA_EJECTCD': 0xec,
     'KEY_MEDIA_VOLUMEUP': 0xed, 'KEY_MEDIA_VOLUMEDOWN': 0xee,
@@ -70,10 +70,17 @@ charList = {
     'KEY_PASTE': 0x7d, 'KEY_FIND': 0x7e,
     'KEY_MUTE': 0x7f, 'KEY_VOLUMEUP': 0x80,
     'KEY_VOLUMEDOWN': 0x81,
-    'KEY_RIGHTMETA': 0xE7,
+    'KEY_RIGHTMETA': 0xE7, "KEY_,": "KEY_COMMA"
 }
 
-# keybaord device handling
+modifierList = {
+    'KEY_GUI': 0x08,
+    'KEY_SHIFT': 0x20,
+}
+
+# ---------------------------------------------------- Translation functions
+
+# keyboard device handling
 def sendChar(char):
     with open('/dev/hidg0', 'rb+') as fd:
         fd.write(char.encode())
@@ -81,50 +88,68 @@ def sendChar(char):
 # Adding machine-readable values to keychars
 def charParser(num):
     return NULL_CHAR*2+chr(num)+NULL_CHAR*5
-print("sending char")
+
+# Modifiers takes up the first of the 8-byte segment
+def modifierParser(mod):
+    return chr(mod)+NULL_CHAR*7
+
+# Pressing a modifier the same time as a regular key, example GUI + R
+def press2gether(mod, key):
+    return chr(mod)+NULL_CHAR+chr(key)+NULL_CHAR*5
+
+# Sends NULL to all eight bytes
+def releaseKeys():
+    return sendChar(NULL_CHAR*8)
+
+# ---------------------------------------------------- output functions
 
 # Sending output to target
-def output(value):
+def outputChar(value):
     sendChar(charParser(charList[value]))
+    releaseKeys()
 
-# for i in charList:
-#     output(i)
+# Sending a modifier value to target
+def outputMod(value):
+    sendChar(modifierParser(modifierList[value]))
+    releaseKeys()
 
-sendChar(chr(8)+NULL_CHAR*7)
+# For sending a modifier + key
+def outputHoldMod(mod, key):
+    sendChar(press2gether(modifierList[mod], charList[key]))
+    releaseKeys()
+    
 
-# time.sleep(1)
-# output("KEY_A")
-# sendChar(NULL_CHAR*8)
-# time.sleep(1)
-# sendChar(NULL_CHAR*8)
-# output("KEY_LEFTMETA")
-# time.sleep(1)
-# sendChar(NULL_CHAR*8)
-# output("KEY_RIGHTMETA")
-# for i in range(20):
-#     output('KEY_A')
-#     sendChar(NULL_CHAR*8)
+# ---------------------------------------------------- functions
 
+def writeString(string):
+    for k in string:
+        try:
+            k = k.upper()
+
+            # Find a better way to do this for all keys with corresponding keycodes
+            if (k == " "):
+                k = "SPACE"
+            if (k == "\n"):
+                k = "ENTER"
+            if(k == ","):
+                k = "COMMA"
+            if(k == "."):
+                k = "DOT"
+
+            # print(str(k))
+            outputChar(f"KEY_{k}")
+            # releaseKeys()
+        except:
+            print(f"Unknown char {k}")
+            releaseKeys()
+
+    print("Done Writing.")
 
 
 # Release all keys
 sendChar(NULL_CHAR*8)
 
 
-# for x, y in charList.items():
-#     print(x, y)
-
-
-# write_report(chrParser(0x04))
-
-# Modifiers
-# enter = NULL_CHAR*2+chr(40)+NULL_CHAR*5
-
-# space = NULL_CHAR*2+chr(44)+NULL_CHAR*5
-# shift = chr(32)
-
-# for i in range(50):
-#     write_report(chrParser())
 
 
 
