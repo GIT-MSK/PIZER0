@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import time
+
 NULL_CHAR = chr(0)
 
 # chars taken from https://github.com/ddavid456/NetworkPiKeyboard/blob/master/NetworkKeyboardAPI.py
@@ -49,7 +51,8 @@ charList = {
     'KEY_DELETE': 0x4c, 'KEY_END': 0x4d,
     'KEY_PAGEDOWN': 0x4e, 'KEY_RIGHT': 0x4f,
     'KEY_LEFT': 0x50, 'KEY_DOWN': 0x51,
-    'KEY_UP': 0x52, 'KEY_MEDIA_PLAYPAUSE': 0xe8,
+    'KEY_UP': 0x52, 'KEY_GUI': 0xe3,
+    'KEY_MEDIA_PLAYPAUSE': 0xe8,
     'KEY_MEDIA_STOPCD': 0xe9, 'KEY_MEDIA_PREVIOUSSONG': 0xea,
     'KEY_MEDIA_NEXTSONG': 0xeb, 'KEY_MEDIA_EJECTCD': 0xec,
     'KEY_MEDIA_VOLUMEUP': 0xed, 'KEY_MEDIA_VOLUMEDOWN': 0xee,
@@ -66,20 +69,50 @@ charList = {
     'KEY_CUT': 0x7b, 'KEY_COPY': 0x7c,
     'KEY_PASTE': 0x7d, 'KEY_FIND': 0x7e,
     'KEY_MUTE': 0x7f, 'KEY_VOLUMEUP': 0x80,
-    'KEY_VOLUMEDOWN': 0x81
+    'KEY_VOLUMEDOWN': 0x81,
+    'KEY_RIGHTMETA': 0xE7,
 }
 
-def write_report(report):
+# keybaord device handling
+def sendChar(char):
     with open('/dev/hidg0', 'rb+') as fd:
-        fd.write(report.encode())
+        fd.write(char.encode())
 
 # Adding machine-readable values to keychars
-def chrParser(num):
+def charParser(num):
     return NULL_CHAR*2+chr(num)+NULL_CHAR*5
+print("sending char")
+
+# Sending output to target
+def output(value):
+    sendChar(charParser(charList[value]))
+
+# for i in charList:
+#     output(i)
+
+sendChar(chr(8)+NULL_CHAR*7)
+
+# time.sleep(1)
+# output("KEY_A")
+# sendChar(NULL_CHAR*8)
+# time.sleep(1)
+# sendChar(NULL_CHAR*8)
+# output("KEY_LEFTMETA")
+# time.sleep(1)
+# sendChar(NULL_CHAR*8)
+# output("KEY_RIGHTMETA")
+# for i in range(20):
+#     output('KEY_A')
+#     sendChar(NULL_CHAR*8)
 
 
-for x, y in charList.items():
-    print(x, y)
+
+# Release all keys
+sendChar(NULL_CHAR*8)
+
+
+# for x, y in charList.items():
+#     print(x, y)
 
 
 # write_report(chrParser(0x04))
@@ -93,36 +126,6 @@ for x, y in charList.items():
 # for i in range(50):
 #     write_report(chrParser())
 
-# Release all keys
-write_report(NULL_CHAR*8)
-#Press a
-# write_report(NULL_CHAR*2+chr(4)+NULL_CHAR*5)
-# # Release keys
-# write_report(NULL_CHAR*8)
-# # Press SHIFT + a = A
-# write_report(chr(32)+NULL_CHAR+chr(4)+NULL_CHAR*5)
 
-# # Press b
-# write_report(NULL_CHAR*2+chr(5)+NULL_CHAR*5)
-# # Release keys
-# write_report(NULL_CHAR*8)
-# # Press SHIFT + b = B
-# write_report(chr(32)+NULL_CHAR+chr(5)+NULL_CHAR*5)
-
-# # Press SPACE key
-# write_report(NULL_CHAR*2+chr(44)+NULL_CHAR*5)
-
-# # Press c key
-# write_report(NULL_CHAR*2+chr(6)+NULL_CHAR*5)
-# # Press d key
-# write_report(NULL_CHAR*2+chr(7)+NULL_CHAR*5)
-
-# # Press RETURN/ENTER key
-# write_report(NULL_CHAR*2+chr(40)+NULL_CHAR*5)
-
-# # Press e key
-# write_report(NULL_CHAR*2+chr(8)+NULL_CHAR*5)
-# # Press f key
-# write_report(NULL_CHAR*2+chr(9)+NULL_CHAR*5)
 
 

@@ -1,14 +1,3 @@
-#!/usr/bin/env python3
-
-NULL_CHAR = chr(0)
-
-def write_report(report):
-    with open('/dev/hidg0', 'rb+') as fd:
-        fd.write(report.encode())
-
-# Adding proper values to keychars
-def chrParser(num):
-    return NULL_CHAR*2+chr(num)+NULL_CHAR*5
 
 # Keyboard chars
 # a = 0x04
@@ -71,23 +60,6 @@ charList = {
     'z': 0x1d,
 }
 
-for x, y in charList.items():
-    print(x, y)
-
-
-# write_report(chrParser(0x04))
-
-# Modifiers
-# enter = NULL_CHAR*2+chr(40)+NULL_CHAR*5
-
-# space = NULL_CHAR*2+chr(44)+NULL_CHAR*5
-# shift = chr(32)
-
-# for i in range(50):
-#     write_report(chrParser())
-
-# Release all keys
-write_report(NULL_CHAR*8)
 #Press a
 # write_report(NULL_CHAR*2+chr(4)+NULL_CHAR*5)
 # # Release keys
@@ -117,5 +89,3 @@ write_report(NULL_CHAR*8)
 # write_report(NULL_CHAR*2+chr(8)+NULL_CHAR*5)
 # # Press f key
 # write_report(NULL_CHAR*2+chr(9)+NULL_CHAR*5)
-
-
