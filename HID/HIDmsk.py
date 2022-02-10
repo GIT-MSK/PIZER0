@@ -52,7 +52,7 @@ charList = {
     'KEY_DELETE': 0x4c, 'KEY_END': 0x4d,
     'KEY_PAGEDOWN': 0x4e, 'KEY_RIGHT': 0x4f,
     'KEY_LEFT': 0x50, 'KEY_DOWN': 0x51,
-    'KEY_UP': 0x52,'KEY_MEDIA_PLAYPAUSE': 0xe8,
+    'KEY_UP': 0x52, 'KEY_MEDIA_PLAYPAUSE': 0xe8,
     'KEY_MEDIA_STOPCD': 0xe9, 'KEY_MEDIA_PREVIOUSSONG': 0xea,
     'KEY_MEDIA_NEXTSONG': 0xeb, 'KEY_MEDIA_EJECTCD': 0xec,
     'KEY_MEDIA_VOLUMEUP': 0xed, 'KEY_MEDIA_VOLUMEDOWN': 0xee,
@@ -70,7 +70,7 @@ charList = {
     'KEY_PASTE': 0x7d, 'KEY_FIND': 0x7e,
     'KEY_MUTE': 0x7f, 'KEY_VOLUMEUP': 0x80,
     'KEY_VOLUMEDOWN': 0x81,
-    'KEY_RIGHTMETA': 0xE7, "KEY_,": "KEY_COMMA"
+    'KEY_,': 'KEY_COMMA'
 }
 
 modifierList = {
@@ -81,43 +81,59 @@ modifierList = {
 # ---------------------------------------------------- Translation functions
 
 # keyboard device handling
+
+
 def sendChar(char):
     with open('/dev/hidg0', 'rb+') as fd:
         fd.write(char.encode())
 
 # Adding machine-readable values to keychars
+
+
 def charParser(num):
     return NULL_CHAR*2+chr(num)+NULL_CHAR*5
 
 # Modifiers takes up the first of the 8-byte segment
+
+
 def modifierParser(mod):
     return chr(mod)+NULL_CHAR*7
 
 # Pressing a modifier the same time as a regular key, example GUI + R
+
+
 def press2gether(mod, key):
     return chr(mod)+NULL_CHAR+chr(key)+NULL_CHAR*5
 
 # Sends NULL to all eight bytes
+
+
 def releaseKeys():
     return sendChar(NULL_CHAR*8)
 
 # ---------------------------------------------------- output functions
 
 # Sending output to target
+
+
 def outputChar(value):
     sendChar(charParser(charList[value]))
     releaseKeys()
 
 # Sending a modifier value to target
+
+
 def outputMod(value):
     sendChar(modifierParser(modifierList[value]))
     releaseKeys()
 
 # For sending a modifier + key
+
+
 def outputHoldMod(mod, key):
     sendChar(press2gether(modifierList[mod], charList[key]))
     releaseKeys()
-    
+
 
 # ---------------------------------------------------- functions
 
@@ -135,7 +151,14 @@ def writeString(string):
                 k = "COMMA"
             if(k == "."):
                 k = "DOT"
-
+            if(k == "/"):
+                k = "SLASH"
+            if(k == ":"):
+                outputHoldMod("KEY_SHIFT", "KEY_SEMICOLON")
+                continue
+            if(k == "!"):
+                outputHoldMod("KEY_SHIFT", "KEY_1")
+                continue
             # print(str(k))
             outputChar(f"KEY_{k}")
             # releaseKeys()
@@ -148,9 +171,3 @@ def writeString(string):
 
 # Release all keys
 sendChar(NULL_CHAR*8)
-
-
-
-
-
-
