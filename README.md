@@ -4,7 +4,7 @@
 
 Projects currently in development to see what is possible with the RPI Zero 2 W.
 
-NB! This is a work in progress, none of the code is final and may be poorly written.
+NB! This is a work in progress, none of the code is final, contains bugs and takes inspiration from other projects.
 
 ## Hardware used in this project:
 
@@ -18,7 +18,7 @@ Setting up the PI as an [HID device](https://www.rmedgar.com/blog/using-rpi-zero
 
 ## Documentation
 
-### BADUSB with the ability to use advanced python scripting and modules
+### BadUSB with the ability to use advanced python scripting and modules
 
 Start every payload by importing the main HID file
 
@@ -53,11 +53,11 @@ def writeString(string):
 
 ```py
 
-from HIDmsk import *
+from HID.HIDmsk import *
 
 
 def main():
-    outputHoldMod('KEY_GUI', 'KEY_R')
+    outputHoldMod('GUI', 'R')
 
     time.sleep(1)
 
@@ -65,12 +65,12 @@ def main():
 
     time.sleep(1)
 
-    outputChar("KEY_ENTER")
+    outputChar("ENTER")
 
-    time.sleep(1)
+    time.sleep(2)
 
-    writeString("Hello From RP Zero 2 W!")
-
+    for i in range(5):
+        writeString("Hello From RP Zero 2 W!\n")
 
 main()
 
@@ -78,6 +78,8 @@ main()
 ```
 
 # Todo
- - More GUI Keys
+ - GUI for screen
  - Find a better way of handling the unknown keys
  - Make the device be able to read strings from files
+ - Make a function to treat the modifier bit the same way as a normal report?
+ - Make the HIDmsk file act as a module so it can be placed anywhere
