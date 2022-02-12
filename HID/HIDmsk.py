@@ -4,8 +4,10 @@ import time
 
 NULL_CHAR = chr(0)
 
-# chars modified from https://github.com/ddavid456/NetworkPiKeyboard/blob/master/NetworkKeyboardAPI.py
+# Chars modified from https://github.com/ddavid456/NetworkPiKeyboard/blob/master/NetworkKeyboardAPI.py
+# Modifiers from https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
 # Corresponds with US ANSI
+
 charList = {
     'A': 0x04, 'B': 0x05,
     'C': 0x06, 'D': 0x07,
