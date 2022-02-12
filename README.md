@@ -55,7 +55,7 @@ def writeString(string):
 
 ```py
 
-from HID.HIDmsk import *
+from HIDmsk import *
 
 
 def main():
