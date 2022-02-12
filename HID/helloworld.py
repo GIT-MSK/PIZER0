@@ -18,4 +18,5 @@ def main():
         writeString("Hello From RP Zero 2 W!\n")
 
 
-main()
+if __name__ == '__main__':
+    main()

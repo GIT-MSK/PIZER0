@@ -74,8 +74,8 @@ def main():
     for i in range(5):
         writeString("Hello From RP Zero 2 W!\n")
 
-main()
-
+if __name__ == '__main__':
+    main()
 
 ```
 
