@@ -20,6 +20,8 @@ Setting up the PI as an [HID device](https://www.rmedgar.com/blog/using-rpi-zero
 
 ### BadUSB with the ability to use advanced python scripting and modules
 
+> NB! The USB-cable or USB-addon has to be connected to the data-port on the RPIzero
+
 Start every payload by importing the main HID file
 
 example:
