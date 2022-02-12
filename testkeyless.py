@@ -1,5 +1,6 @@
 
-from HID.HIDmsk import *
+from hidtest.HIDmsk import outputChar, writeString, outputHoldMod, outputMod
+import time
 
 
 def main():
