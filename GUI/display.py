@@ -1,9 +1,3 @@
-# SPDX-FileCopyrightText: 2021 ladyada for Adafruit Industries
-# SPDX-License-Identifier: MIT
-
-# -*- coding: utf-8 -*-
-
-from hashlib import new
 import time
 import subprocess
 from digitalio import DigitalInOut, Direction
@@ -97,6 +91,9 @@ line5 = top + 160
 line6 = top + 200
 line7 = top + 240
 
+# test to draw lines on screen, taken from p4wnp1 GUI
+# used to draw the about page++
+
 
 def drawLines(l1, l2, l3, l4, l5, l6):
     draw.text((0, line1), l1,  font=font, fill=255)
@@ -127,7 +124,7 @@ font = ImageFont.truetype(
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
 
 
-def start():
+def about():
     # simple sub routine to show an About
     drawLines(
         "     MSK PIZERO    ",
@@ -139,27 +136,20 @@ def start():
     )
 
 
-def chosenItem(items):
-    # Keep track of where in the item list we currentl are
-    print(items[1])
-
-
-global menuindex
-
 menuItems = {
     '     MSK PIZERO   ': line1,
     'HIDScript': line2,
     'SysInfo': line3,
     'WIFI': line4,
     'About': line5,
-    'Reserved': line6
+    'Shutdown': line6
 }
 
 # items = ['HIDScript', 'SysInfo', 'WIFI', 'About', 'Reserved']
 # Box and text rendered in portrait mode
 
 
-def menu(names, index):
+def mainMenu(names, index):
     for item, placement in names.items():
         # print(item, placement)
         newKey = list(names)
@@ -170,52 +160,121 @@ def menu(names, index):
         else:
             draw.text((0, placement), item, font=font, fill=255)
 
+# Work in progress for menus containing files
 
-# menu(menuItems, 1)
-# def menu(menustr, index):
-#     global menuindex
-#     font = ImageFont.load_default()
-#     draw.rectangle(width, height, outline="white", fill="black")
-#     for i in range(len(menustr)):
-#         if(i == index):
-#             menuindex = i
-#             # invert(draw, 2, i*10, menustr[i])
-#         else:
-#             draw.text((2, i*10), menustr[i], font=font, fill=255)
 
-# names = ['Disk', 'Memory', 'Network', 'CPUUsage', 'IPAddress', 'CODELECTRON']
-# with canvas(device) as draw:
-#     menu(device, draw, names, 1)
+def dynamicMenu():
+    return
+
+
+def findMainMenuItem(names, index):
+    for item, placement in names.items():
+        # print(item, placement)
+        newKey = list(names)
+        # print(newKey[index])
+        if(item == newKey[index]):
+            print(item + " Is indexed!")
+            return item
+
+
+def stats():
+    # Shell scripts for system monitoring from here:
+    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    cmd = "hostname -I | cut -d' ' -f1"
+    IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    CPU = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%s MB\", $3,$2 }'"
+    MemUsage = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = 'df -h | awk \'$NF=="/"{printf "Disk: %d/%d GB  %s", $3,$2,$5}\''
+    Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
+    Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "who | grep pts | awk {' print $2 '}"
+    SSH = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    blankLine = "AAAAAAAAAAAAAAAA"
+
+    # Draw the text to the screen
+    y = top
+    draw.text((x, y), IP, font=font, fill="#FFFFFF")
+    y += font.getsize(IP)[1]
+    draw.text((x, y), CPU, font=font, fill="#FFFF00")
+    y += font.getsize(CPU)[1]
+    draw.text((x, y), MemUsage, font=font, fill="#00FF00")
+    y += font.getsize(MemUsage)[1]
+    draw.text((x, y), Disk, font=font, fill="#0000FF")
+    y += font.getsize(Disk)[1]
+    draw.text((x, y), Temp, font=font, fill="#FF00FF")
+    y += font.getsize(blankLine)[1]
+    draw.text((x, y), blankLine, font=font, fill="#000000")
+    y += font.getsize(SSH)[1]
+    draw.text((x, y), SSH, font=font, fill="#FFFFFA")
+
+
+def shutdown():
+    print("shutting down")
+    command = "/usr/bin/sudo /sbin/shutdown -h now"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print(output)
+
+# Global ?
+
+
 guiIndex = 1
+menuIndex = 1
 
 while True:
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
-    # start()
-    # Handling of out of bound indexes
-    if(guiIndex <= 0):
-        guiIndex = 5
-    elif(guiIndex >= 6):
-        guiIndex = 1
+    # Control of what menu we are currently in
+    if(menuIndex == 1):
 
-    menu(menuItems, guiIndex)
+        # Handling of out of bound indexes
+        # makes this more dynamic
+        if(guiIndex <= 0):
+            guiIndex = 5
+        elif(guiIndex >= 6):
+            guiIndex = 1
+
+        mainMenu(menuItems, guiIndex)
+
+        if not button_A.value:
+            print("A clicked")
+            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+            # result = subprocess.check_output(command, shell=True)
+            guiIndex = 1
+
+        if not button_B.value:
+            print("B clicked")
+
+            indexedItem = findMainMenuItem(menuItems, guiIndex)
+
+            # Find a clean way to do this for all menu items
+            if(indexedItem == "SysInfo"):
+                menuIndex = 2
+            elif(indexedItem == "Shutdown"):
+                shutdown()
+
+        if not button_D.value:  # down pressed
+            print("Down")
+            guiIndex += 1
+
+        if not button_U.value:
+            print("UP")
+            guiIndex -= 1
+    elif(menuIndex == 2):
+        stats()
+
+        if not button_A.value:
+            print("A clicked")
+            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+            # result = subprocess.check_output(command, shell=True)
+            menuIndex = 1
 
     # draw.text((110, 110), str(counter),  font=font, fill=255)
 
-    if not button_A.value:
-        print("A clicked")
-        # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-        # result = subprocess.check_output(command, shell=True)
-        guiIndex = 1
-
-    if not button_D.value:  # down pressed
-        print("Down")
-        guiIndex += 1
-
-    if not button_U.value:
-        print("UP")
-        guiIndex -= 1
     # Shell scripts for system monitoring from here:
     # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
     # cmd = "hostname -I | cut -d' ' -f1"

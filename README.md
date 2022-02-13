@@ -1,4 +1,4 @@
-# PIZero
+# PIZer0
 
 ## Purpose
 
@@ -72,7 +72,7 @@ def main():
     time.sleep(2)
 
     for i in range(5):
-        writeString("Hello From RP Zero 2 W!\n")
+        writeString("Hello From RPI Zero 2 W!\n")
 
 if __name__ == '__main__':
     main()
