@@ -149,12 +149,14 @@ while True:
     A_fill = 0
     if not button_A.value:  # left pressed
         A_fill = button_fill
+        print("Hello from A")
     draw.ellipse((140, 80, 180, 120), outline=button_outline,
                  fill=A_fill)  # A button
 
     B_fill = 0
     if not button_B.value:  # left pressed
         B_fill = button_fill
+        print("Hello from B")
     draw.ellipse((190, 40, 230, 80), outline=button_outline,
                  fill=B_fill)  # B button
 

@@ -4,7 +4,7 @@ import sys
 import os
 
 # sys.path.insert(0,'<project directory>') OR
-sys.path.append(os.getcwd())
+# sys.path.append(os.getcwd())
 
 # keyboard device handling
 
