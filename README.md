@@ -6,6 +6,8 @@ Projects currently in development to see what is possible with the RPI Zero 2 W.
 
 NB! This is a work in progress, none of the code is final, contains bugs and takes inspiration from other projects.
 
+Everything created is created for my own educational purposes.
+
 ## Hardware used in this project:
 
 Raspberry Pi: [Pi Zero 2 W ](https://www.raspberrypi.com/products/raspberry-pi-zero-2-w/)  
