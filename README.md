@@ -87,4 +87,4 @@ if __name__ == '__main__':
  - Make the device be able to read strings from files
  - Make a function to treat the modifier bit the same way as a normal report?
  - Make the HIDmsk file act as a module so it can be placed anywhere
- - Seperate functions from keylists
+ - Find a cleaner way of handling button presses

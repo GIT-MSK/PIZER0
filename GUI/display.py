@@ -79,6 +79,13 @@ bottom = height - padding
 # Move left to right keeping track of the current x position for drawing shapes.
 x = 0
 
+# Alternatively load a TTF font.  Make sure the .ttf font file is in the
+# same directory as the python script!
+# Some other nice fonts to try: http://www.dafont.com/bitmap.php
+font = ImageFont.truetype(
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+
+
 # Set up a number of lines you want to show
 # menu 1, 2, 3, 4, 5, 6, 7....
 # answer 1, 2, 3, 4, 5, 6, 7...
@@ -95,16 +102,7 @@ line7 = top + 240
 # used to draw the about page++
 
 
-def drawLines(l1, l2, l3, l4, l5, l6):
-    draw.text((0, line1), l1,  font=font, fill=255)
-    draw.text((0, line2), l2, font=font, fill=255)
-    draw.text((0, line3), l3,  font=font, fill=255)
-    draw.text((0, line4), l4,  font=font, fill=255)
-    draw.text((0, line5), l5, font=font, fill=255)
-    draw.text((0, line6), l6, font=font, fill=255)
-
-# Function to do shell commands
-
+# -------------------------------------------- Script functionality
 
 def shell(cmd):
     return(subprocess.check_output(cmd, shell=True))
@@ -159,15 +157,15 @@ def shutdown():
     print(output)
 
 
-def home(index):
-    index = 1
+# -------------------------------------------- Pages
 
-
-# Alternatively load a TTF font.  Make sure the .ttf font file is in the
-# same directory as the python script!
-# Some other nice fonts to try: http://www.dafont.com/bitmap.php
-font = ImageFont.truetype(
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 24)
+def drawLines(l1, l2, l3, l4, l5, l6):
+    draw.text((0, line1), l1,  font=font, fill=255)
+    draw.text((0, line2), l2, font=font, fill=255)
+    draw.text((0, line3), l3,  font=font, fill=255)
+    draw.text((0, line4), l4,  font=font, fill=255)
+    draw.text((0, line5), l5, font=font, fill=255)
+    draw.text((0, line6), l6, font=font, fill=255)
 
 
 def about():
@@ -178,7 +176,7 @@ def about():
         "For education",
         "",
         "Project by:",
-        "GIT-MSK",
+        "-MSK-",
     )
 
 
@@ -191,9 +189,19 @@ menuItems = {
     'Shutdown': line6
 }
 
-# items = ['HIDScript', 'SysInfo', 'WIFI', 'About', 'Reserved']
-# Box and text rendered in portrait mode
+wifiItems = {
+    '           WIFI       ': line1,
+    'Show WIFIS': line2,
+    'MITM': line3,
+    'DeAuther': line4,
+    'GetHash': line5,
+    'Shutdown': line6
+}
 
+
+# -------------------------------------------- Menu functions
+
+# Makes a text based GUI menu that shows your current pos >MenuItem
 
 def mainMenu(names, index):
     for item, placement in names.items():
@@ -206,11 +214,7 @@ def mainMenu(names, index):
         else:
             draw.text((0, placement), item, font=font, fill=255)
 
-# Work in progress for menus containing files
-
-
-def dynamicMenu():
-    return
+# Finds the current selected menuitem and returns in
 
 
 def findMainMenuItem(names, index):
@@ -222,6 +226,20 @@ def findMainMenuItem(names, index):
             print(item + " Is indexed!")
             return item
 
+# Indexing the list, making it scrollable by looking for what the current guiIndex is
+
+
+def indexItems(list):
+
+    guiIndex = 1
+
+    # Assumes theres is a title in line 1
+    if(guiIndex <= 0):
+        guiIndex = len(list) - 1
+        return guiIndex
+    elif(guiIndex >= len(list)):
+        guiIndex = 1
+        return guiIndex
 
 # Global ?
 
@@ -229,27 +247,34 @@ def findMainMenuItem(names, index):
 guiIndex = 1
 menuIndex = 1
 
+# The entire menu system needs a cleanup, python switch case when?
+
+
 while True:
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
+    # Handling of buttons to scroll up and down the list of items
+    if not button_D.value:  # down pressed
+        print("Down")
+        guiIndex += 1
+
+    if not button_U.value:
+        print("UP")
+        guiIndex -= 1
+
+    if not button_A.value:
+        print("A clicked")
+        # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+        # result = subprocess.check_output(command, shell=True)
+        guiIndex = 1
+
     # Control of what menu we are currently in
     if(menuIndex == 1):
 
-        # Handling of out of bound indexes
-        # makes this more dynamic
-        if(guiIndex <= 0):
-            guiIndex = 5
-        elif(guiIndex >= 6):
-            guiIndex = 1
+        indexItems(menuItems)
 
         mainMenu(menuItems, guiIndex)
-
-        if not button_A.value:
-            print("A clicked")
-            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-            # result = subprocess.check_output(command, shell=True)
-            guiIndex = 1
 
         if not button_B.value:
             print("B clicked")
@@ -268,16 +293,34 @@ while True:
                 menuIndex = 5
             elif(indexedItem == "Shutdown"):
                 shutdown()
+    # HID Scripts
+    elif(menuIndex == 2):
 
-        if not button_D.value:  # down pressed
-            print("Down")
-            guiIndex += 1
-
-        if not button_U.value:
-            print("UP")
-            guiIndex -= 1
+        if not button_A.value:
+            print("A clicked")
+            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+            # result = subprocess.check_output(command, shell=True)
+            menuIndex = 1
     elif(menuIndex == 3):
         stats()
+
+        if not button_A.value:
+            print("A clicked")
+            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+            # result = subprocess.check_output(command, shell=True)
+            menuIndex = 1
+
+    # Wifi menu
+    elif(menuIndex == 4):
+        if(guiIndex <= 0):
+            guiIndex = 5
+        elif(guiIndex >= 6):
+            guiIndex = 1
+
+        indexItems(wifiItems)
+
+        mainMenu(wifiItems, guiIndex)
+
     elif(menuIndex == 5):
         about()
 
