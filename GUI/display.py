@@ -117,6 +117,52 @@ def listPayloads():
     print(files)
 
 
+def stats():
+    # Shell scripts for system monitoring from here:
+    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    cmd = "hostname -I | cut -d' ' -f1"
+    IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    CPU = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%s MB\", $3,$2 }'"
+    MemUsage = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = 'df -h | awk \'$NF=="/"{printf "Disk: %d/%d GB  %s", $3,$2,$5}\''
+    Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
+    Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    cmd = "who | grep pts | awk {' print $2 '}"
+    SSH = subprocess.check_output(cmd, shell=True).decode("utf-8")
+    blankLine = "AAAAAAAAAAAAAAAA"
+
+    # Draw the text to the screen
+    y = top
+    draw.text((x, y), IP, font=font, fill="#FFFFFF")
+    y += font.getsize(IP)[1]
+    draw.text((x, y), CPU, font=font, fill="#FFFF00")
+    y += font.getsize(CPU)[1]
+    draw.text((x, y), MemUsage, font=font, fill="#00FF00")
+    y += font.getsize(MemUsage)[1]
+    draw.text((x, y), Disk, font=font, fill="#0000FF")
+    y += font.getsize(Disk)[1]
+    draw.text((x, y), Temp, font=font, fill="#FF00FF")
+    y += font.getsize(blankLine)[1]
+    draw.text((x, y), blankLine, font=font, fill="#000000")
+    y += font.getsize(SSH)[1]
+    draw.text((x, y), SSH, font=font, fill="#FFFFFA")
+
+
+def shutdown():
+    print("shutting down")
+    command = "/usr/bin/sudo /sbin/shutdown -h now"
+    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
+    output = process.communicate()[0]
+    print(output)
+
+
+def home(index):
+    index = 1
+
+
 # Alternatively load a TTF font.  Make sure the .ttf font file is in the
 # same directory as the python script!
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
@@ -129,10 +175,10 @@ def about():
     drawLines(
         "     MSK PIZERO    ",
         "",
+        "For education",
+        "",
         "Project by:",
         "GIT-MSK",
-        "",
-        "",
     )
 
 
@@ -177,47 +223,6 @@ def findMainMenuItem(names, index):
             return item
 
 
-def stats():
-    # Shell scripts for system monitoring from here:
-    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "hostname -I | cut -d' ' -f1"
-    IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-    CPU = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%s MB\", $3,$2 }'"
-    MemUsage = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = 'df -h | awk \'$NF=="/"{printf "Disk: %d/%d GB  %s", $3,$2,$5}\''
-    Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
-    Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    cmd = "who | grep pts | awk {' print $2 '}"
-    SSH = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    blankLine = "AAAAAAAAAAAAAAAA"
-
-    # Draw the text to the screen
-    y = top
-    draw.text((x, y), IP, font=font, fill="#FFFFFF")
-    y += font.getsize(IP)[1]
-    draw.text((x, y), CPU, font=font, fill="#FFFF00")
-    y += font.getsize(CPU)[1]
-    draw.text((x, y), MemUsage, font=font, fill="#00FF00")
-    y += font.getsize(MemUsage)[1]
-    draw.text((x, y), Disk, font=font, fill="#0000FF")
-    y += font.getsize(Disk)[1]
-    draw.text((x, y), Temp, font=font, fill="#FF00FF")
-    y += font.getsize(blankLine)[1]
-    draw.text((x, y), blankLine, font=font, fill="#000000")
-    y += font.getsize(SSH)[1]
-    draw.text((x, y), SSH, font=font, fill="#FFFFFA")
-
-
-def shutdown():
-    print("shutting down")
-    command = "/usr/bin/sudo /sbin/shutdown -h now"
-    process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
-    output = process.communicate()[0]
-    print(output)
-
 # Global ?
 
 
@@ -252,8 +257,15 @@ while True:
             indexedItem = findMainMenuItem(menuItems, guiIndex)
 
             # Find a clean way to do this for all menu items
-            if(indexedItem == "SysInfo"):
+
+            if(indexedItem == "HIDScript"):
                 menuIndex = 2
+            elif(indexedItem == "SysInfo"):
+                menuIndex = 3
+            elif(indexedItem == "WIFI"):
+                menuIndex = 4
+            elif(indexedItem == "About"):
+                menuIndex = 5
             elif(indexedItem == "Shutdown"):
                 shutdown()
 
@@ -264,8 +276,10 @@ while True:
         if not button_U.value:
             print("UP")
             guiIndex -= 1
-    elif(menuIndex == 2):
+    elif(menuIndex == 3):
         stats()
+    elif(menuIndex == 5):
+        about()
 
         if not button_A.value:
             print("A clicked")
@@ -274,38 +288,6 @@ while True:
             menuIndex = 1
 
     # draw.text((110, 110), str(counter),  font=font, fill=255)
-
-    # Shell scripts for system monitoring from here:
-    # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    # cmd = "hostname -I | cut -d' ' -f1"
-    # IP = "IP: " + subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-    # CPU = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # cmd = "free -m | awk 'NR==2{printf \"Mem: %s/%s MB  %.2f%%\", $3,$2,$3*100/$2 }'"
-    # MemUsage = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # cmd = 'df -h | awk \'$NF=="/"{printf "Disk: %d/%d GB  %s", $3,$2,$5}\''
-    # Disk = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # cmd = "cat /sys/class/thermal/thermal_zone0/temp |  awk '{printf \"CPU Temp: %.1f C\", $(NF-0) / 1000}'"  # pylint: disable=line-too-long
-    # Temp = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # cmd = "who | grep pts | awk {' print $2 '}"
-    # SSH = subprocess.check_output(cmd, shell=True).decode("utf-8")
-    # blankLine = "AAAAAAAAAAAAAAAA"
-
-    # # Write four lines of text.
-    # y = top
-    # draw.text((x, y), IP, font=font, fill="#FFFFFF")
-    # y += font.getsize(IP)[1]
-    # draw.text((x, y), CPU, font=font, fill="#FFFF00")
-    # y += font.getsize(CPU)[1]
-    # draw.text((x, y), MemUsage, font=font, fill="#00FF00")
-    # y += font.getsize(MemUsage)[1]
-    # draw.text((x, y), Disk, font=font, fill="#0000FF")
-    # y += font.getsize(Disk)[1]
-    # draw.text((x, y), Temp, font=font, fill="#FF00FF")
-    # y += font.getsize(blankLine)[1]
-    # draw.text((x, y), blankLine, font=font, fill="#000000")
-    # y += font.getsize(SSH)[1]
-    # draw.text((x, y), SSH, font=font, fill="#FFFFFA")
 
     # Display image.
     disp.image(image, rotation)
