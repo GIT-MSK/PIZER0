@@ -1,10 +1,10 @@
-from hidtest.HIDmsk import outputHoldMod
+
 import time
 import sys
 import os
-
-sys.path.insert(0, '/home/pi/rpi/hidtest')
 # sys.path.append(os.getcwd())
+
+from HID.scripts.HIDmsk import *
 
 
 def main():

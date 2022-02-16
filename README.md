@@ -82,9 +82,9 @@ if __name__ == '__main__':
 ```
 
 # Todo
- - GUI for screen
  - Find a better way of handling the unknown keys
  - Make the device be able to read strings from files
  - Make a function to treat the modifier bit the same way as a normal report?
  - Make the HIDmsk file act as a module so it can be placed anywhere
  - Find a cleaner way of handling button presses
+ - Make the payloads menu indexable and scrollable

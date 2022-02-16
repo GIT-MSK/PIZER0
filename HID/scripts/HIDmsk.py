@@ -1,7 +1,7 @@
 
-from hidtest.keycode import NULL_CHAR, charList, modifierList
-import sys
-import os
+from keycode import NULL_CHAR, charList, modifierList
+# import sys
+# import os
 
 # sys.path.insert(0,'<project directory>') OR
 # sys.path.append(os.getcwd())

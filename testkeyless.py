@@ -1,5 +1,5 @@
 
-from hidtest.HIDmsk import outputChar, writeString, outputHoldMod, outputMod
+from HID.HIDmsk import outputChar, writeString, outputHoldMod, outputMod
 import time
 
 

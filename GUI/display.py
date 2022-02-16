@@ -1,10 +1,12 @@
 import time
+import os
 import subprocess
 from digitalio import DigitalInOut, Direction
 import board
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7789
 
+payloadsPath = "/home/pi/rpi/payloads"
 
 # Configuration for CS and DC pins (these are FeatherWing defaults on M0/M4):
 cs_pin = DigitalInOut(board.CE0)
@@ -109,10 +111,14 @@ def shell(cmd):
 
 
 def listPayloads():
-    command = "ls -F --format=single-column /home/pi/rpi/payloads"
-    files = subprocess.check_output(command, shell=True)
-    files = files.split("\n")
-    print(files)
+
+    for x in os.listdir(payloadsPath):
+        if x.endswith(".py"):
+            print(x)
+
+
+# payloads = listPayloads()
+# print(str(payloads))
 
 
 def stats():
@@ -167,6 +173,15 @@ def drawLines(l1, l2, l3, l4, l5, l6):
     draw.text((0, line5), l5, font=font, fill=255)
     draw.text((0, line6), l6, font=font, fill=255)
 
+# Does currently not work correctly with over 6 items
+
+
+def drawDynamicLines(list):
+    pos = top + 40
+    for x in list:
+        draw.text((0, pos), x, font=font, fill=255)
+        pos += 40
+
 
 def about():
     # simple sub routine to show an About
@@ -195,7 +210,7 @@ wifiItems = {
     'MITM': line3,
     'DeAuther': line4,
     'GetHash': line5,
-    'Shutdown': line6
+    # 'Shutdown': line6
 }
 
 
@@ -229,17 +244,15 @@ def findMainMenuItem(names, index):
 # Indexing the list, making it scrollable by looking for what the current guiIndex is
 
 
-def indexItems(list):
-
-    guiIndex = 1
+def indexItems(list, guiIndex):
 
     # Assumes theres is a title in line 1
     if(guiIndex <= 0):
         guiIndex = len(list) - 1
-        return guiIndex
     elif(guiIndex >= len(list)):
         guiIndex = 1
-        return guiIndex
+
+    return guiIndex
 
 # Global ?
 
@@ -256,15 +269,12 @@ while True:
 
     # Handling of buttons to scroll up and down the list of items
     if not button_D.value:  # down pressed
-        print("Down")
         guiIndex += 1
 
     if not button_U.value:
-        print("UP")
         guiIndex -= 1
 
     if not button_A.value:
-        print("A clicked")
         # command = "sudo python3 /home/pi/rpi/testkeyless.py"
         # result = subprocess.check_output(command, shell=True)
         guiIndex = 1
@@ -272,12 +282,10 @@ while True:
     # Control of what menu we are currently in
     if(menuIndex == 1):
 
-        indexItems(menuItems)
-
+        guiIndex = indexItems(menuItems, guiIndex)
         mainMenu(menuItems, guiIndex)
 
         if not button_B.value:
-            print("B clicked")
 
             indexedItem = findMainMenuItem(menuItems, guiIndex)
 
@@ -296,41 +304,41 @@ while True:
     # HID Scripts
     elif(menuIndex == 2):
 
+        payloadList = os.listdir(payloadsPath)
+
+        drawDynamicLines(payloadList)
+
         if not button_A.value:
-            print("A clicked")
             # command = "sudo python3 /home/pi/rpi/testkeyless.py"
             # result = subprocess.check_output(command, shell=True)
             menuIndex = 1
+    # SysInfo
     elif(menuIndex == 3):
         stats()
 
         if not button_A.value:
-            print("A clicked")
             # command = "sudo python3 /home/pi/rpi/testkeyless.py"
             # result = subprocess.check_output(command, shell=True)
             menuIndex = 1
 
     # Wifi menu
     elif(menuIndex == 4):
-        if(guiIndex <= 0):
-            guiIndex = 5
-        elif(guiIndex >= 6):
-            guiIndex = 1
 
-        indexItems(wifiItems)
-
+        guiIndex = indexItems(wifiItems, guiIndex)
         mainMenu(wifiItems, guiIndex)
 
+        if not button_A.value:
+            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
+            # result = subprocess.check_output(command, shell=True)
+            menuIndex = 1
+    # About page
     elif(menuIndex == 5):
         about()
 
         if not button_A.value:
-            print("A clicked")
             # command = "sudo python3 /home/pi/rpi/testkeyless.py"
             # result = subprocess.check_output(command, shell=True)
             menuIndex = 1
-
-    # draw.text((110, 110), str(counter),  font=font, fill=255)
 
     # Display image.
     disp.image(image, rotation)
