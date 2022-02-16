@@ -6,7 +6,7 @@ import board
 from PIL import Image, ImageDraw, ImageFont
 from adafruit_rgb_display import st7789
 
-payloadsPath = "/home/pi/rpi/payloads"
+payloadsPath = "/home/pi/rpi/HID"
 
 # Configuration for CS and DC pins (these are FeatherWing defaults on M0/M4):
 cs_pin = DigitalInOut(board.CE0)

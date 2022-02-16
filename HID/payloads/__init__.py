@@ -1,1 +1,1 @@
-from ..scripts.HIDmsk import *
+from ..functions.HIDmsk import *

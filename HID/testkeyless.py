@@ -1,5 +1,5 @@
 
-from HIDmsk import outputChar, writeString, outputHoldMod, outputMod
+from functions.HIDmsk import outputChar, writeString, outputHoldMod, outputMod
 import time
 
 

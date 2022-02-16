@@ -4,7 +4,7 @@ import sys
 import os
 # sys.path.append(os.getcwd())
 
-from HID.scripts.HIDmsk import *
+from HID.functions.HIDmsk import *
 
 
 def main():

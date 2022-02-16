@@ -1,5 +1,5 @@
 
-from keycode import NULL_CHAR, charList, modifierList
+from .keycode import NULL_CHAR, charList, modifierList
 # import sys
 # import os
 
