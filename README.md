@@ -2,7 +2,7 @@
 
 ## Prototype
 
-![Prototype]("img/20220217_233918.jpg")
+![Prototype](img/20220217_233918.jpg)
 
 ## Purpose
 
