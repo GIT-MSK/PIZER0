@@ -1,5 +1,9 @@
 # PIZer0
 
+## Prototype
+
+![Prototype]("img/20220217_233918.jpg")
+
 ## Purpose
 
 Projects currently in development to see what is possible with the RPI Zero 2 W.
