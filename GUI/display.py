@@ -1,3 +1,4 @@
+from logging import error
 import time
 import os
 import subprocess
@@ -107,17 +108,6 @@ def shell(cmd):
     return(subprocess.check_output(cmd, shell=True))
 
 
-def listPayloads():
-
-    for x in os.listdir(payloadsPath):
-        if x.endswith(".py"):
-            print(x)
-
-
-# payloads = listPayloads()
-# print(str(payloads))
-
-
 def stats():
     # Shell scripts for system monitoring from here:
     # https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
@@ -151,6 +141,8 @@ def stats():
     y += font.getsize(SSH)[1]
     draw.text((x, y), SSH, font=font, fill="#FFFFFA")
 
+# Safe shutdown
+
 
 def shutdown():
     print("shutting down")
@@ -158,6 +150,26 @@ def shutdown():
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output = process.communicate()[0]
     print(output)
+
+# List all python HID payloads form the chosen payloads directory
+
+
+def listPayloads():
+
+    files = []
+
+    for x in os.listdir(payloadsPath):
+        if x.endswith(".py") and not x.startswith("_"):
+            files.append(x)
+
+    return files
+
+# Executes a file from the GUI
+
+
+def execHID(file):
+    command = f"sudo python3 {payloadsPath}/{file} &"
+    subprocess.run(command, shell=True)
 
 
 # -------------------------------------------- Pages
@@ -256,7 +268,8 @@ def indexItems(list, guiIndex):
 
     return guiIndex
 
-# Indexing of files (or items) , with pages that does not have titles
+# Indexing of files (or items) , with pages that does not have titles in the list
+
 
 def indexFiles(list, guiIndex):
 
@@ -289,8 +302,7 @@ while True:
         guiIndex -= 1
 
     if not button_A.value:
-        # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-        # result = subprocess.check_output(command, shell=True)
+
         guiIndex = 1
         menuIndex = 1
 
@@ -319,14 +331,32 @@ while True:
     # HID Scripts
     elif(menuIndex == 2):
 
-        payloadList = os.listdir(payloadsPath)
+        # Make this multithreaded, one thread writes to the screen, while the other executes
+        # Currently this implementation is increadibly buggy
+        draw.text((95, line1), "HID",  font=font, fill=255)
 
+        payloadList = listPayloads()
         guiIndex = indexFiles(payloadList, guiIndex)
-
         drawDynamicLines(payloadList, guiIndex)
 
-    # SysInfo
+        if not button_B.value:
+
+            draw.rectangle((0, 0, width, height), outline=0, fill=0)
+
+            draw.text((0, line5), "exec...",  font=font, fill=255)
+            print("Exec...")
+            time.sleep(1)
+
+            try:
+
+                currentFile = payloadList[guiIndex]
+                execHID(currentFile)
+            except error:
+                print(error)
+
+            # SysInfo
     elif(menuIndex == 3):
+
         stats()
 
     # Wifi menu
@@ -338,11 +368,6 @@ while True:
     # About page
     elif(menuIndex == 5):
         about()
-
-        if not button_A.value:
-            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-            # result = subprocess.check_output(command, shell=True)
-            menuIndex = 1
 
     # Display image.
     disp.image(image, rotation)
