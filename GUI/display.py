@@ -100,11 +100,8 @@ line5 = top + 160
 line6 = top + 200
 line7 = top + 240
 
-# test to draw lines on screen, taken from p4wnp1 GUI
-# used to draw the about page++
-
-
 # -------------------------------------------- Script functionality
+
 
 def shell(cmd):
     return(subprocess.check_output(cmd, shell=True))
@@ -176,13 +173,6 @@ def drawLines(l1, l2, l3, l4, l5, l6):
 # Does currently not work correctly with over 6 items
 
 
-def drawDynamicLines(list):
-    pos = top + 40
-    for x in list:
-        draw.text((0, pos), x, font=font, fill=255)
-        pos += 40
-
-
 def about():
     # simple sub routine to show an About
     drawLines(
@@ -241,6 +231,18 @@ def findMainMenuItem(names, index):
             print(item + " Is indexed!")
             return item
 
+
+def drawDynamicLines(list, index):
+    pos = top + 40
+    for x in list:
+
+        if(x == list[index]):
+            draw.text((0, pos), f">{x}", font=font, fill="#ffffff")
+        else:
+            draw.text((0, pos), x, font=font, fill=255)
+
+        pos += 40
+
 # Indexing the list, making it scrollable by looking for what the current guiIndex is
 
 
@@ -251,6 +253,18 @@ def indexItems(list, guiIndex):
         guiIndex = len(list) - 1
     elif(guiIndex >= len(list)):
         guiIndex = 1
+
+    return guiIndex
+
+# Indexing of files (or items) , with pages that does not have titles
+
+def indexFiles(list, guiIndex):
+
+    # Assumes theres is a title in line 1
+    if(guiIndex < 0):
+        guiIndex = len(list) - 1
+    elif(guiIndex >= len(list)):
+        guiIndex = 0
 
     return guiIndex
 
@@ -278,6 +292,7 @@ while True:
         # command = "sudo python3 /home/pi/rpi/testkeyless.py"
         # result = subprocess.check_output(command, shell=True)
         guiIndex = 1
+        menuIndex = 1
 
     # Control of what menu we are currently in
     if(menuIndex == 1):
@@ -306,20 +321,13 @@ while True:
 
         payloadList = os.listdir(payloadsPath)
 
-        drawDynamicLines(payloadList)
+        guiIndex = indexFiles(payloadList, guiIndex)
 
-        if not button_A.value:
-            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-            # result = subprocess.check_output(command, shell=True)
-            menuIndex = 1
+        drawDynamicLines(payloadList, guiIndex)
+
     # SysInfo
     elif(menuIndex == 3):
         stats()
-
-        if not button_A.value:
-            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-            # result = subprocess.check_output(command, shell=True)
-            menuIndex = 1
 
     # Wifi menu
     elif(menuIndex == 4):
@@ -327,10 +335,6 @@ while True:
         guiIndex = indexItems(wifiItems, guiIndex)
         mainMenu(wifiItems, guiIndex)
 
-        if not button_A.value:
-            # command = "sudo python3 /home/pi/rpi/testkeyless.py"
-            # result = subprocess.check_output(command, shell=True)
-            menuIndex = 1
     # About page
     elif(menuIndex == 5):
         about()
