@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Projects currently in development to see what is possible with the RPI Zero 2 W.
+The project currently not being developed. Might continue sometime in the future.
 
 NB! This is a work in progress, none of the code is final, contains bugs and takes inspiration from other projects.
 
@@ -21,6 +21,8 @@ Screen: [Adafruit 1.3" TFT color bonnet ](https://learn.adafruit.com/adafruit-1-
 
 Setting up the PI as an [HID device](https://www.rmedgar.com/blog/using-rpi-zero-as-keyboard-setup-and-device-definition/)  
 [Screen Drivers](https://learn.adafruit.com/adafruit-1-3-color-tft-bonnet-for-raspberry-pi/python-setup) and setup
+
+If you have the same display, run the display.py file to show the GUI after everything is set up.
 
 ## Documentation
 
